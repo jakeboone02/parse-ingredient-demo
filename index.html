@@ -11,7 +11,7 @@
     <style>
       body {
         color: #333;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         margin: 1rem;
       }
       code {
@@ -30,6 +30,20 @@
       }
       footer {
         text-align: center;
+      }
+      .flex {
+        display: flex;
+        gap: 0;
+        flex-direction: column;
+      }
+      .flex > * {
+        flex-grow: 1;
+      }
+      @media (min-width: 64em) {
+        .flex {
+          gap: 1rem;
+          flex-direction: row-reverse;
+        }
       }
     </style>
     <style>
@@ -52,7 +66,7 @@
       }
       #forkongithub a::before,
       #forkongithub a::after {
-        content: '';
+        content: "";
         width: 100%;
         display: block;
         position: absolute;
@@ -109,18 +123,25 @@
         </a>
       </strong>
     </p>
-    <h4>Instructions</h4>
-    <p>Enter an ingredient list in the text box, then click the "Parse" button.</p>
-    <p>
-      The ingredient list may contain group headers (starting with
-      <code>'For '</code> or ending with a colon (<code>':'</code>)).
-    </p>
-    <p>
-      Numbers may be represented as integers, decimals, mixed numbers (e.g.
-      <code>1 1/2</code>), or vulgar fractions (e.g. <code>½</code>).
-    </p>
-    <h4>Ingredient List</h4>
-    <textarea id="ingredient-list" cols="90" rows="20">
+    <div class="flex">
+      <div>
+        <h4>Instructions</h4>
+        <p>
+          Enter an ingredient list in the text box. The results will update with
+          every keystroke.
+        </p>
+        <p>
+          The ingredient list may contain group headers (starting with
+          <code>'For '</code> or ending with a colon (<code>':'</code>)).
+        </p>
+        <p>
+          Numbers may be represented as integers, decimals, mixed numbers (e.g.
+          <code>1 1/2</code>), or vulgar fractions (e.g. <code>½</code>).
+        </p>
+      </div>
+      <div>
+        <h4>Ingredient List</h4>
+        <textarea id="ingredient-list" cols="80" rows="18">
 For The Buttercream (or make a cream cheese frosting)
 4 large egg whites
 1 cup packed light-brown sugar
@@ -136,46 +157,51 @@ For The Cake
 1/2 teaspoon ground ginger
 3⁄4 teaspoon salt
 2 cups packed light-brown sugar
-2 large eggs
+Large egg x 2
 4 Granny Smith apples, peeled, two coarsely grated and two diced</textarea
-    >
-    <br />
-    <label>
-      <input type="checkbox" id="normalize-uom" />
-      Normalize units of measure
-    </label>
-    <br />
-    <label>
-      <input type="checkbox" id="allow-leading-of" />
-      Allow leading "of " in descriptions
-    </label>
-    <br />
-    <button type="button" id="parse">Parse</button>
+        >
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: row; gap: 1rem">
+      <label>
+        <input type="checkbox" id="normalize-uom" />
+        Normalize units of measure
+      </label>
+      <label>
+        <input type="checkbox" id="allow-leading-of" />
+        Allow leading "of " in descriptions
+      </label>
+    </div>
     <h4>Results</h4>
-    <pre id="results" class="language-json">(Click "Parse" to see results.)</pre>
+    <pre id="results" class="language-json">Loading...</pre>
     <footer>
       Copyright © <span id="year">2023</span>
       <a href="https://github.com/jakeboone02">Jake Boone</a>
     </footer>
     <script>
-      document.getElementById('year').innerText = new Date().getFullYear();
+      document.getElementById("year").innerText = new Date().getFullYear();
     </script>
     <script src="https://unpkg.com/parse-ingredient"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
     <script>
-      document.getElementById('parse').addEventListener('click', () => {
-        const normalizeUOM = document.getElementById('normalize-uom').checked;
-        const allowLeadingOf = document.getElementById('allow-leading-of').checked;
-        document.getElementById('results').innerHTML = JSON.stringify(
-          ParseIngredient.parseIngredient(document.getElementById('ingredient-list').value, {
+      const $ = document.getElementById;
+      const updateResults = () => {
+        const normalizeUOM = $("normalize-uom").checked;
+        const allowLeadingOf = $("allow-leading-of").checked;
+        $("results").innerHTML = JSON.stringify(
+          ParseIngredient.parseIngredient($("ingredient-list").value, {
             normalizeUOM,
             allowLeadingOf,
           }),
           null,
           2
         );
-        hljs.highlightBlock(document.getElementById('results'));
-      });
+        hljs.highlightBlock($("results"));
+      };
+      $("normalize-uom").addEventListener("change", updateResults);
+      $("allow-leading-of").addEventListener("change", updateResults);
+      $("ingredient-list").addEventListener("keyup", updateResults);
+      updateResults();
     </script>
   </body>
 </html>
