@@ -184,23 +184,29 @@ Large egg x 2
     <script src="https://unpkg.com/parse-ingredient"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
     <script>
-      const $ = document.getElementById;
       const updateResults = () => {
-        const normalizeUOM = $("normalize-uom").checked;
-        const allowLeadingOf = $("allow-leading-of").checked;
-        $("results").innerHTML = JSON.stringify(
-          ParseIngredient.parseIngredient($("ingredient-list").value, {
-            normalizeUOM,
-            allowLeadingOf,
-          }),
+        const normalizeUOM = document.getElementById("normalize-uom").checked;
+        const allowLeadingOf =
+          document.getElementById("allow-leading-of").checked;
+        document.getElementById("results").innerHTML = JSON.stringify(
+          ParseIngredient.parseIngredient(
+            document.getElementById("ingredient-list").value,
+            { normalizeUOM, allowLeadingOf }
+          ),
           null,
           2
         );
-        hljs.highlightBlock($("results"));
+        hljs.highlightBlock(document.getElementById("results"));
       };
-      $("normalize-uom").addEventListener("change", updateResults);
-      $("allow-leading-of").addEventListener("change", updateResults);
-      $("ingredient-list").addEventListener("keyup", updateResults);
+      document
+        .getElementById("normalize-uom")
+        .addEventListener("change", updateResults);
+      document
+        .getElementById("allow-leading-of")
+        .addEventListener("change", updateResults);
+      document
+        .getElementById("ingredient-list")
+        .addEventListener("keyup", updateResults);
       updateResults();
     </script>
   </body>
