@@ -118,17 +118,14 @@
     </p>
     <p>
       <strong>
-        <a href="https://jakeboone02.github.io/parse-ingredient">
-          Full documentation
-        </a>
+        <a href="https://jakeboone02.github.io/parse-ingredient"> Full documentation </a>
       </strong>
     </p>
     <div class="flex">
       <div>
         <h4>Instructions</h4>
         <p>
-          Enter an ingredient list in the text box. The results will update with
-          every keystroke.
+          Enter an ingredient list in the text box. The results will update with every keystroke.
         </p>
         <p>
           The ingredient list may contain group headers (starting with
@@ -181,32 +178,26 @@ Large egg x 2
     <script>
       document.getElementById("year").innerText = new Date().getFullYear();
     </script>
-    <script src="https://unpkg.com/parse-ingredient"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
-    <script>
+    <script type="module">
+      import { parseIngredient } from "https://esm.sh/parse-ingredient";
+      import hljs from "https://esm.sh/highlight.js";
+
       const updateResults = () => {
         const normalizeUOM = document.getElementById("normalize-uom").checked;
-        const allowLeadingOf =
-          document.getElementById("allow-leading-of").checked;
+        const allowLeadingOf = document.getElementById("allow-leading-of").checked;
         document.getElementById("results").innerHTML = JSON.stringify(
-          ParseIngredient.parseIngredient(
-            document.getElementById("ingredient-list").value,
-            { normalizeUOM, allowLeadingOf }
-          ),
+          parseIngredient(document.getElementById("ingredient-list").value, {
+            normalizeUOM,
+            allowLeadingOf,
+          }),
           null,
           2
         );
         hljs.highlightBlock(document.getElementById("results"));
       };
-      document
-        .getElementById("normalize-uom")
-        .addEventListener("change", updateResults);
-      document
-        .getElementById("allow-leading-of")
-        .addEventListener("change", updateResults);
-      document
-        .getElementById("ingredient-list")
-        .addEventListener("keyup", updateResults);
+      document.getElementById("normalize-uom").addEventListener("change", updateResults);
+      document.getElementById("allow-leading-of").addEventListener("change", updateResults);
+      document.getElementById("ingredient-list").addEventListener("keyup", updateResults);
       updateResults();
     </script>
   </body>
