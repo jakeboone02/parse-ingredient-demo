@@ -11,21 +11,20 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <button id="theme-toggle" class="theme-toggle" title="Toggle theme">◐</button>
     <span id="forkongithub">
       <a href="https://github.com/jakeboone02/parse-ingredient">
         Fork&nbsp;me&nbsp;on&nbsp;GitHub
       </a>
     </span>
-    <p>
-      This is the demo page for the
-      <a href="https://npmjs.com/package/parse-ingredient">parse-ingredient</a>
-      npm package. Try it out below!
-    </p>
-    <p>
-      <strong>
-        <a href="https://jakeboone02.github.io/parse-ingredient"> Full documentation </a>
-      </strong>
-    </p>
+    <header class="page-header">
+      <h1>parse-ingredient</h1>
+      <nav>
+        <a href="https://npmjs.com/package/parse-ingredient">npm</a>
+        <a href="https://jakeboone02.github.io/parse-ingredient">Documentation</a>
+        <a href="https://github.com/jakeboone02/parse-ingredient">GitHub</a>
+      </nav>
+    </header>
     <div class="flex">
       <div>
         <h4>Instructions</h4>
@@ -87,6 +86,40 @@ Large egg x 2
     </footer>
     <script>
       document.getElementById("year").innerText = new Date().getFullYear();
+    </script>
+    <script>
+      (function () {
+        const root = document.documentElement;
+        const btn = document.getElementById("theme-toggle");
+        const themes = ["light", "system", "dark"];
+        const icons = { light: "☼", system: "◐", dark: "☾" };
+        const titles = { light: "Light mode", system: "System preference", dark: "Dark mode" };
+
+        function setTheme(theme) {
+          btn.textContent = icons[theme];
+          btn.title = titles[theme];
+
+          if (theme === "system") {
+            root.removeAttribute("data-theme");
+            localStorage.removeItem("theme");
+          } else {
+            root.setAttribute("data-theme", theme);
+            localStorage.setItem("theme", theme);
+          }
+        }
+
+        function cycleTheme() {
+          const current = localStorage.getItem("theme") || "system";
+          const nextIndex = (themes.indexOf(current) + 1) % themes.length;
+          setTheme(themes[nextIndex]);
+        }
+
+        // Initialize from saved preference
+        setTheme(localStorage.getItem("theme") || "system");
+
+        // Add click handler
+        btn.addEventListener("click", cycleTheme);
+      })();
     </script>
     <script type="module">
       import { parseIngredient } from "https://esm.sh/parse-ingredient";

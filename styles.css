@@ -6,6 +6,7 @@
   --color-text-muted: #666;
   --color-bg: #fafafa;
   --color-bg-subtle: #f5f5f5;
+  --color-bg-input: #fff;
   --color-border: #ddd;
   --color-border-light: #e8e8e8;
   --color-accent: #6b8e6b;
@@ -17,6 +18,40 @@
   --transition-normal: 0.25s ease;
 }
 
+/* Dark mode colors */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-text: #e0e0e0;
+    --color-text-muted: #a0a0a0;
+    --color-bg: #1a1a1a;
+    --color-bg-subtle: #252525;
+    --color-bg-input: #2a2a2a;
+    --color-border: #404040;
+    --color-border-light: #353535;
+    --color-accent: #8fb88f;
+    --color-accent-hover: #a0c9a0;
+    --color-accent-light: rgba(143, 184, 143, 0.15);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* Manual dark mode override */
+:root[data-theme="dark"] {
+  --color-text: #e0e0e0;
+  --color-text-muted: #a0a0a0;
+  --color-bg: #1a1a1a;
+  --color-bg-subtle: #252525;
+  --color-bg-input: #2a2a2a;
+  --color-border: #404040;
+  --color-border-light: #353535;
+  --color-accent: #8fb88f;
+  --color-accent-hover: #a0c9a0;
+  --color-accent-light: rgba(143, 184, 143, 0.15);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
 /* ==========================================================================
    Base Styles
    ========================================================================== */
@@ -25,8 +60,37 @@ body {
   color: var(--color-text);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
-  margin: 1.5rem;
+  margin: 1.5rem auto;
   max-width: 1214px;
+  padding: 0 1.5rem;
+}
+
+/* ==========================================================================
+   Page Header
+   ========================================================================== */
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-header h1 {
+  color: var(--color-accent);
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.page-header nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.page-header nav a {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.page-header nav a:hover {
+  color: var(--color-accent);
 }
 
 /* ==========================================================================
@@ -72,8 +136,9 @@ code {
    Form Elements
    ========================================================================== */
 textarea {
-  background-color: #fff;
+  background-color: var(--color-bg-input);
   border: 1px solid var(--color-border);
+  color: var(--color-text);
   border-radius: 0.5rem;
   box-shadow: var(--shadow-sm);
   font-family: inherit;
@@ -128,7 +193,7 @@ input[type="checkbox"] {
    Results Section
    ========================================================================== */
 pre {
-  background: linear-gradient(135deg, #fff 0%, var(--color-bg-subtle) 100%);
+  background: linear-gradient(135deg, var(--color-bg-input) 0%, var(--color-bg-subtle) 100%);
   border: 1px solid var(--color-border);
   border-radius: 0.5rem;
   box-shadow: var(--shadow-md);
@@ -138,7 +203,42 @@ pre {
 
 /* Override highlight.js background */
 pre.hljs {
-  background: linear-gradient(135deg, #fff 0%, var(--color-bg-subtle) 100%);
+  background: linear-gradient(135deg, var(--color-bg-input) 0%, var(--color-bg-subtle) 100%);
+}
+
+/* Dark mode highlight.js overrides */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) pre.hljs {
+    color: #e0e0e0;
+  }
+  :root:not([data-theme="light"]) .hljs-attr {
+    color: #9cdcfe;
+  }
+  :root:not([data-theme="light"]) .hljs-string {
+    color: #ce9178;
+  }
+  :root:not([data-theme="light"]) .hljs-number {
+    color: #b5cea8;
+  }
+  :root:not([data-theme="light"]) .hljs-literal {
+    color: #569cd6;
+  }
+}
+
+:root[data-theme="dark"] pre.hljs {
+  color: #e0e0e0;
+}
+:root[data-theme="dark"] .hljs-attr {
+  color: #9cdcfe;
+}
+:root[data-theme="dark"] .hljs-string {
+  color: #ce9178;
+}
+:root[data-theme="dark"] .hljs-number {
+  color: #b5cea8;
+}
+:root[data-theme="dark"] .hljs-literal {
+  color: #569cd6;
 }
 
 /* ==========================================================================
@@ -180,6 +280,39 @@ footer a {
 footer a:hover {
   color: var(--color-accent-hover);
   text-decoration: underline;
+}
+
+/* ==========================================================================
+   Theme Toggle
+   ========================================================================== */
+.theme-toggle {
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: 0.25rem 0.5rem;
+  position: fixed;
+  right: 0.75rem;
+  top: 0.75rem;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+  z-index: 10000;
+}
+
+.theme-toggle:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+@media screen and (min-width: 800px) {
+  .theme-toggle {
+    right: 210px;
+  }
 }
 
 /* ==========================================================================
