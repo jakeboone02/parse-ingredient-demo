@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -8,124 +8,28 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/default.min.css"
     />
-    <style>
-      body {
-        color: #333;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        margin: 1rem;
-      }
-      code {
-        background-color: lightgray;
-        border: 1px solid darkgray;
-        border-radius: 4px;
-        padding: 0.1rem;
-      }
-      pre {
-        border: 1px solid gray;
-        border-radius: 0.5rem;
-        padding: 1rem;
-      }
-      h4 {
-        border-bottom: 1px solid lightgray;
-      }
-      footer {
-        text-align: center;
-      }
-      .flex {
-        display: flex;
-        gap: 0;
-        flex-direction: column;
-      }
-      .flex > * {
-        flex-grow: 1;
-      }
-      @media (min-width: 64em) {
-        .flex {
-          gap: 1rem;
-          flex-direction: row-reverse;
-        }
-      }
-    </style>
-    <style>
-      #forkongithub a {
-        background: #000;
-        color: #fff;
-        text-decoration: none;
-        font-family: arial, sans-serif;
-        text-align: center;
-        font-weight: bold;
-        padding: 5px 40px;
-        font-size: 1rem;
-        line-height: 2rem;
-        position: relative;
-        transition: 0.5s;
-      }
-      #forkongithub a:hover {
-        background: #c11;
-        color: #fff;
-      }
-      #forkongithub a::before,
-      #forkongithub a::after {
-        content: "";
-        width: 100%;
-        display: block;
-        position: absolute;
-        top: 1px;
-        left: 0;
-        height: 1px;
-        background: #fff;
-      }
-      #forkongithub a::after {
-        bottom: 1px;
-        top: auto;
-      }
-      @media screen and (min-width: 800px) {
-        #forkongithub {
-          position: fixed;
-          display: block;
-          top: 0;
-          right: 0;
-          width: 200px;
-          overflow: hidden;
-          height: 200px;
-          z-index: 9999;
-        }
-        #forkongithub a {
-          width: 200px;
-          position: absolute;
-          top: 60px;
-          right: -60px;
-          transform: rotate(45deg);
-          -webkit-transform: rotate(45deg);
-          -ms-transform: rotate(45deg);
-          -moz-transform: rotate(45deg);
-          -o-transform: rotate(45deg);
-          box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.8);
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <button id="theme-toggle" class="theme-toggle" title="Toggle theme">◐</button>
     <span id="forkongithub">
       <a href="https://github.com/jakeboone02/parse-ingredient">
         Fork&nbsp;me&nbsp;on&nbsp;GitHub
       </a>
     </span>
-    <p>
-      This is the demo page for the
-      <a href="https://npmjs.com/package/parse-ingredient">parse-ingredient</a>
-      npm package. Try it out below!
-    </p>
-    <p>
-      <strong>
-        <a href="https://jakeboone02.github.io/parse-ingredient"> Full documentation </a>
-      </strong>
-    </p>
+    <header class="page-header">
+      <h1>parse-ingredient</h1>
+      <nav>
+        <a href="https://npmjs.com/package/parse-ingredient">npm</a>
+        <a href="https://jakeboone02.github.io/parse-ingredient">Documentation</a>
+        <a href="https://github.com/jakeboone02/parse-ingredient">GitHub</a>
+      </nav>
+    </header>
     <div class="flex">
       <div>
         <h4>Instructions</h4>
         <p>
-          Enter an ingredient list in the text box. The results will update with every keystroke.
+          Enter an ingredient list in the text box. The results will update as you type.
         </p>
         <p>
           The ingredient list may contain group headers (starting with
@@ -133,8 +37,23 @@
         </p>
         <p>
           Numbers may be represented as integers, decimals, mixed numbers (e.g.
-          <code>1 1/2</code>), or vulgar fractions (e.g. <code>½</code>).
+          <code>1 1/2</code>), or vulgar fractions (e.g. <code>1½</code>).
         </p>
+        <h4>Options</h4>
+        <div class="checkbox-row">
+          <label>
+            <input type="checkbox" id="normalize-uom" />
+            Normalize units of measure
+          </label>
+          <label>
+            <input type="checkbox" id="allow-leading-of" />
+            Allow leading "of " in descriptions
+          </label>
+          <label>
+            <input type="checkbox" id="decimal-comma" />
+            Use decimal comma (e.g. <code>1,5</code> instead of <code>1.5</code>)
+          </label>
+        </div>
       </div>
       <div>
         <h4>Ingredient List</h4>
@@ -159,24 +78,48 @@ Large egg x 2
         >
       </div>
     </div>
-    <div style="display: flex; flex-direction: row; gap: 1rem">
-      <label>
-        <input type="checkbox" id="normalize-uom" />
-        Normalize units of measure
-      </label>
-      <label>
-        <input type="checkbox" id="allow-leading-of" />
-        Allow leading "of " in descriptions
-      </label>
-    </div>
     <h4>Results</h4>
     <pre id="results" class="language-json">Loading...</pre>
     <footer>
-      Copyright © <span id="year">2023</span>
+      Copyright © <span id="year">2026</span>
       <a href="https://github.com/jakeboone02">Jake Boone</a>
     </footer>
     <script>
       document.getElementById("year").innerText = new Date().getFullYear();
+    </script>
+    <script>
+      (function () {
+        const root = document.documentElement;
+        const btn = document.getElementById("theme-toggle");
+        const themes = ["light", "system", "dark"];
+        const icons = { light: "☼", system: "◐", dark: "☾" };
+        const titles = { light: "Light mode", system: "System preference", dark: "Dark mode" };
+
+        function setTheme(theme) {
+          btn.textContent = icons[theme];
+          btn.title = titles[theme];
+
+          if (theme === "system") {
+            root.removeAttribute("data-theme");
+            localStorage.removeItem("theme");
+          } else {
+            root.setAttribute("data-theme", theme);
+            localStorage.setItem("theme", theme);
+          }
+        }
+
+        function cycleTheme() {
+          const current = localStorage.getItem("theme") || "system";
+          const nextIndex = (themes.indexOf(current) + 1) % themes.length;
+          setTheme(themes[nextIndex]);
+        }
+
+        // Initialize from saved preference
+        setTheme(localStorage.getItem("theme") || "system");
+
+        // Add click handler
+        btn.addEventListener("click", cycleTheme);
+      })();
     </script>
     <script type="module">
       import { parseIngredient } from "https://esm.sh/parse-ingredient";
@@ -185,18 +128,22 @@ Large egg x 2
       const updateResults = () => {
         const normalizeUOM = document.getElementById("normalize-uom").checked;
         const allowLeadingOf = document.getElementById("allow-leading-of").checked;
+        const decimalSeparator = document.getElementById("decimal-comma").checked ? "," : ".";
         document.getElementById("results").innerHTML = JSON.stringify(
           parseIngredient(document.getElementById("ingredient-list").value, {
             normalizeUOM,
             allowLeadingOf,
+            decimalSeparator,
           }),
           null,
-          2
+          2,
         );
-        hljs.highlightBlock(document.getElementById("results"));
+        delete document.getElementById("results").dataset.highlighted;
+        hljs.highlightElement(document.getElementById("results"));
       };
       document.getElementById("normalize-uom").addEventListener("change", updateResults);
       document.getElementById("allow-leading-of").addEventListener("change", updateResults);
+      document.getElementById("decimal-comma").addEventListener("change", updateResults);
       document.getElementById("ingredient-list").addEventListener("keyup", updateResults);
       updateResults();
     </script>
