@@ -104,6 +104,14 @@ h4 {
   padding-bottom: 0.5rem;
 }
 
+h5 {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  margin: 1rem 0 0.5rem;
+  text-transform: uppercase;
+}
+
 a {
   color: var(--color-text-muted);
   text-decoration: none;
@@ -161,6 +169,33 @@ textarea:focus {
   outline: none;
 }
 
+input[type="text"],
+input[type="number"],
+select {
+  background-color: var(--color-bg-input);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-sm);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  padding: 0.4rem 0.6rem;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+  border-color: var(--color-accent);
+  box-shadow:
+    0 0 0 3px var(--color-accent-light),
+    var(--shadow-sm);
+  outline: none;
+}
+
 /* Custom Checkbox Styling */
 label {
   align-items: center;
@@ -184,13 +219,66 @@ input[type="checkbox"] {
 /* Checkbox container */
 .checkbox-row {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
   margin: 0;
 }
 
+.checkbox-row label {
+  white-space: nowrap;
+}
+
 /* ==========================================================================
-   Results Section
+   Advanced Options (details/summary)
+   ========================================================================== */
+.advanced-options {
+  border: 1px solid var(--color-border-light);
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+  padding: 0;
+}
+
+.advanced-options summary {
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.6rem 0.75rem;
+  transition: color var(--transition-fast);
+}
+
+.advanced-options summary:hover {
+  color: var(--color-accent);
+}
+
+.advanced-options[open] summary {
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.advanced-options-grid {
+  display: grid;
+  gap: 0.5rem 1rem;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  padding: 0.75rem;
+}
+
+.advanced-options-grid label {
+  cursor: default;
+  font-size: 0.9rem;
+  justify-self: end;
+}
+
+.advanced-options-grid label:hover {
+  color: inherit;
+}
+
+.advanced-options-grid input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   Results & Code Preview
    ========================================================================== */
 pre {
   background: linear-gradient(135deg, var(--color-bg-input) 0%, var(--color-bg-subtle) 100%);
@@ -204,6 +292,17 @@ pre {
 /* Override highlight.js background */
 pre.hljs {
   background: linear-gradient(135deg, var(--color-bg-input) 0%, var(--color-bg-subtle) 100%);
+}
+
+/* Call preview styling */
+.call-preview {
+  font-size: 0.875rem;
+}
+
+/* Results pre constrained height */
+#results {
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
 /* Dark mode highlight.js overrides */
@@ -242,23 +341,48 @@ pre.hljs {
 }
 
 /* ==========================================================================
-   Layout
+   Two-Column Layout (textarea / results)
    ========================================================================== */
-.flex {
+.two-col {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 1rem;
 }
 
-.flex > * {
-  flex-grow: 1;
+.two-col-input,
+.two-col-output {
+  flex: 1;
+  min-width: 0;
 }
 
 @media (min-width: 64em) {
-  .flex {
-    flex-direction: row-reverse;
+  .two-col {
+    flex-direction: row;
     gap: 2rem;
   }
+}
+
+/* ==========================================================================
+   Convert Controls
+   ========================================================================== */
+.convert-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.convert-controls label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.convert-controls input[type="number"] {
+  width: 5rem;
+}
+
+.convert-controls select {
+  min-width: 6rem;
 }
 
 /* ==========================================================================

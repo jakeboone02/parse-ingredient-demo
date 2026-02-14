@@ -25,39 +25,76 @@
         <a href="https://github.com/jakeboone02/parse-ingredient">GitHub</a>
       </nav>
     </header>
-    <div class="flex">
-      <div>
-        <h4>Instructions</h4>
-        <p>
-          Enter an ingredient list in the text box. The results will update as you type.
-        </p>
-        <p>
-          The ingredient list may contain group headers (starting with
-          <code>'For '</code> or ending with a colon (<code>':'</code>)).
-        </p>
-        <p>
-          Numbers may be represented as integers, decimals, mixed numbers (e.g.
-          <code>1 1/2</code>), or vulgar fractions (e.g. <code>1½</code>).
-        </p>
-        <h4>Options</h4>
-        <div class="checkbox-row">
-          <label>
-            <input type="checkbox" id="normalize-uom" />
-            Normalize units of measure
-          </label>
-          <label>
-            <input type="checkbox" id="allow-leading-of" />
-            Allow leading "of " in descriptions
-          </label>
-          <label>
-            <input type="checkbox" id="decimal-comma" />
-            Use decimal comma (e.g. <code>1,5</code> instead of <code>1.5</code>)
-          </label>
-        </div>
+
+    <p>
+      Enter an ingredient list in the text box below. Results update as you type. Numbers can be
+      integers, decimals, mixed numbers (e.g. <code>1 1/2</code>), or vulgar fractions (e.g.
+      <code>1½</code>).
+    </p>
+
+    <section>
+      <h4><code>parseIngredient</code></h4>
+
+      <div class="checkbox-row">
+        <label>
+          <input type="checkbox" id="normalize-uom" />
+          <code>normalizeUOM</code>
+        </label>
+        <label>
+          <input type="checkbox" id="allow-leading-of" />
+          <code>allowLeadingOf</code>
+        </label>
+        <label>
+          <input type="checkbox" id="decimal-comma" />
+          <code>decimalSeparator: ","</code>
+        </label>
+        <label>
+          <input type="checkbox" id="include-meta" />
+          <code>includeMeta</code>
+        </label>
+        <label>
+          <input type="checkbox" id="partial-unit-matching" />
+          <code>partialUnitMatching</code>
+        </label>
       </div>
-      <div>
-        <h4>Ingredient List</h4>
-        <textarea id="ingredient-list" cols="80" rows="18">
+
+      <details class="advanced-options">
+        <summary>Advanced options</summary>
+        <div class="advanced-options-grid">
+          <label for="group-header-patterns"><code>groupHeaderPatterns</code></label>
+          <input
+            type="text"
+            id="group-header-patterns"
+            placeholder="For"
+          />
+          <label for="range-separators"><code>rangeSeparators</code></label>
+          <input
+            type="text"
+            id="range-separators"
+            placeholder="or, to"
+          />
+          <label for="description-strip-prefixes"><code>descriptionStripPrefixes</code></label>
+          <input
+            type="text"
+            id="description-strip-prefixes"
+            placeholder="of"
+          />
+          <label for="trailing-quantity-context"><code>trailingQuantityContext</code></label>
+          <input
+            type="text"
+            id="trailing-quantity-context"
+            placeholder="from, of"
+          />
+        </div>
+      </details>
+
+      <h5>Call</h5>
+      <pre id="parse-preview" class="call-preview language-javascript"></pre>
+
+      <div class="two-col">
+        <div class="two-col-input">
+          <h5>Input</h5>
+          <textarea id="ingredient-list" cols="80" rows="10">
 For The Buttercream (or make a cream cheese frosting)
 4 large egg whites
 1 cup packed light-brown sugar
@@ -74,14 +111,40 @@ For The Cake
 3⁄4 teaspoon salt
 2 cups packed light-brown sugar
 Large egg x 2
-4 Granny Smith apples, peeled, two coarsely grated and two diced</textarea
-        >
+4 Granny Smith apples, peeled, two coarsely grated and two diced</textarea>
+        </div>
+        <div class="two-col-output">
+          <h5>Results</h5>
+          <pre id="results" class="language-json">Loading...</pre>
+        </div>
       </div>
-    </div>
-    <h4>Results</h4>
-    <pre id="results" class="language-json">Loading...</pre>
+    </section>
+
+    <section>
+      <h4><code>convertUnit</code></h4>
+
+      <div class="convert-controls">
+        <label for="convert-value">Value</label>
+        <input type="number" id="convert-value" value="1" step="0.01" />
+
+        <label for="convert-from-unit">From</label>
+        <select id="convert-from-unit"></select>
+
+        <label for="convert-to-unit">To</label>
+        <select id="convert-to-unit"></select>
+      </div>
+
+      <h5>Call</h5>
+      <pre id="convert-preview" class="call-preview language-javascript"></pre>
+
+      <div>
+        <strong>Result:</strong>
+        <span id="convert-result">-</span>
+      </div>
+    </section>
+
     <footer>
-      Copyright © <span id="year">2026</span>
+      Copyright &copy; <span id="year">2026</span>
       <a href="https://github.com/jakeboone02">Jake Boone</a>
     </footer>
     <script>
@@ -114,38 +177,190 @@ Large egg x 2
           setTheme(themes[nextIndex]);
         }
 
-        // Initialize from saved preference
         setTheme(localStorage.getItem("theme") || "system");
-
-        // Add click handler
         btn.addEventListener("click", cycleTheme);
       })();
     </script>
     <script type="module">
-      import { parseIngredient } from "https://esm.sh/parse-ingredient";
+      import {
+        parseIngredient,
+        convertUnit,
+        unitsOfMeasure,
+      } from "https://esm.sh/parse-ingredient@2.1.0";
       import hljs from "https://esm.sh/highlight.js";
 
+      // --- Elements ---
+      const normalizeUOMEl = document.getElementById("normalize-uom");
+      const allowLeadingOfEl = document.getElementById("allow-leading-of");
+      const decimalCommaEl = document.getElementById("decimal-comma");
+      const includeMetaEl = document.getElementById("include-meta");
+      const partialUnitMatchingEl = document.getElementById("partial-unit-matching");
+      const groupHeaderPatternsEl = document.getElementById("group-header-patterns");
+      const rangeSeparatorsEl = document.getElementById("range-separators");
+      const descriptionStripPrefixesEl = document.getElementById("description-strip-prefixes");
+      const trailingQuantityContextEl = document.getElementById("trailing-quantity-context");
+      const ingredientListEl = document.getElementById("ingredient-list");
+      const resultsEl = document.getElementById("results");
+      const parsePreviewEl = document.getElementById("parse-preview");
+
+      // --- Parse preview ---
+      const parseArrayOption = (el) => {
+        const val = el.value.trim();
+        if (!val) return undefined;
+        return val.split(",").map((s) => s.trim()).filter(Boolean);
+      };
+
+      const buildParseOpts = () => {
+        const opts = {};
+        if (normalizeUOMEl.checked) opts.normalizeUOM = true;
+        if (allowLeadingOfEl.checked) opts.allowLeadingOf = true;
+        if (decimalCommaEl.checked) opts.decimalSeparator = ",";
+        if (includeMetaEl.checked) opts.includeMeta = true;
+        if (partialUnitMatchingEl.checked) opts.partialUnitMatching = true;
+        const ghp = parseArrayOption(groupHeaderPatternsEl);
+        if (ghp) opts.groupHeaderPatterns = ghp;
+        const rs = parseArrayOption(rangeSeparatorsEl);
+        if (rs) opts.rangeSeparators = rs;
+        const dsp = parseArrayOption(descriptionStripPrefixesEl);
+        if (dsp) opts.descriptionStripPrefixes = dsp;
+        const tqc = parseArrayOption(trailingQuantityContextEl);
+        if (tqc) opts.trailingQuantityContext = tqc;
+        return opts;
+      };
+
+      const highlightEl = (el) => {
+        delete el.dataset.highlighted;
+        hljs.highlightElement(el);
+      };
+
+      const updateParsePreview = () => {
+        const opts = buildParseOpts();
+        const hasOpts = Object.keys(opts).length > 0;
+        parsePreviewEl.textContent = hasOpts
+          ? `parseIngredient(ingredientText, ${JSON.stringify(opts, null, 2)})`
+          : `parseIngredient(ingredientText)`;
+        highlightEl(parsePreviewEl);
+      };
+
       const updateResults = () => {
-        const normalizeUOM = document.getElementById("normalize-uom").checked;
-        const allowLeadingOf = document.getElementById("allow-leading-of").checked;
-        const decimalSeparator = document.getElementById("decimal-comma").checked ? "," : ".";
-        document.getElementById("results").innerHTML = JSON.stringify(
-          parseIngredient(document.getElementById("ingredient-list").value, {
-            normalizeUOM,
-            allowLeadingOf,
-            decimalSeparator,
-          }),
+        const opts = buildParseOpts();
+        resultsEl.textContent = JSON.stringify(
+          parseIngredient(ingredientListEl.value, opts),
           null,
           2,
         );
-        delete document.getElementById("results").dataset.highlighted;
-        hljs.highlightElement(document.getElementById("results"));
+        highlightEl(resultsEl);
+        updateParsePreview();
       };
-      document.getElementById("normalize-uom").addEventListener("change", updateResults);
-      document.getElementById("allow-leading-of").addEventListener("change", updateResults);
-      document.getElementById("decimal-comma").addEventListener("change", updateResults);
-      document.getElementById("ingredient-list").addEventListener("keyup", updateResults);
+
+      // Bind parse option controls
+      [
+        normalizeUOMEl,
+        allowLeadingOfEl,
+        decimalCommaEl,
+        includeMetaEl,
+        partialUnitMatchingEl,
+      ].forEach((el) => el.addEventListener("change", updateResults));
+
+      [
+        groupHeaderPatternsEl,
+        rangeSeparatorsEl,
+        descriptionStripPrefixesEl,
+        trailingQuantityContextEl,
+      ].forEach((el) => el.addEventListener("input", updateResults));
+
+      ingredientListEl.addEventListener("input", updateResults);
       updateResults();
+
+      // --- Unit conversion ---
+      const fromUnitSelect = document.getElementById("convert-from-unit");
+      const toUnitSelect = document.getElementById("convert-to-unit");
+      const convertPreviewEl = document.getElementById("convert-preview");
+      const systems = ["us", "imperial", "metric"];
+      const systemLabel = { us: "US", imperial: "Imperial", metric: "Metric" };
+
+      const hasMultipleSystems = (unitId) =>
+        typeof unitsOfMeasure[unitId]?.conversionFactor === "object";
+
+      const convertibleUnits = Object.entries(unitsOfMeasure)
+        .filter(([, unit]) => unit.conversionFactor)
+        .sort((a, b) => a[0].localeCompare(b[0]));
+
+      // Populate selects: for multi-system units, add one option per system
+      convertibleUnits.forEach(([id]) => {
+        if (hasMultipleSystems(id)) {
+          systems.forEach((sys) => {
+            [fromUnitSelect, toUnitSelect].forEach((sel) => {
+              const opt = document.createElement("option");
+              opt.value = `${id}::${sys}`;
+              opt.textContent = `${id} (${systemLabel[sys]})`;
+              sel.appendChild(opt);
+            });
+          });
+        } else {
+          [fromUnitSelect, toUnitSelect].forEach((sel) => {
+            const opt = document.createElement("option");
+            opt.value = id;
+            opt.textContent = id;
+            sel.appendChild(opt);
+          });
+        }
+      });
+
+      fromUnitSelect.value = "cup::us";
+      toUnitSelect.value = "milliliter";
+
+      // Parse a select value into { unit, system }
+      const parseUnitValue = (val) => {
+        const parts = val.split("::");
+        return { unit: parts[0], system: parts[1] || null };
+      };
+
+      // Show both systems whenever either side is not "us".
+      // Omit entirely when both resolve to "us" (explicit "us" or null).
+      const buildConvertOpts = (from, to) => {
+        const fs = from.system ?? "us";
+        const ts = to.system ?? "us";
+        if (fs === "us" && ts === "us") return {};
+        const opts = {};
+        if (from.system) opts.fromSystem = from.system;
+        if (to.system) opts.toSystem = to.system;
+        return opts;
+      };
+
+      const buildConvertPreview = () => {
+        const value = document.getElementById("convert-value").value;
+        const from = parseUnitValue(fromUnitSelect.value);
+        const to = parseUnitValue(toUnitSelect.value);
+        const opts = buildConvertOpts(from, to);
+
+        let text = `convertUnit(${value}, "${from.unit}", "${to.unit}"`;
+        if (Object.keys(opts).length > 0) {
+          const parts = Object.entries(opts).map(([k, v]) => `${k}: "${v}"`);
+          text += `, { ${parts.join(", ")} }`;
+        }
+        text += ")";
+        convertPreviewEl.textContent = text;
+        highlightEl(convertPreviewEl);
+      };
+
+      const updateConversion = () => {
+        const value = parseFloat(document.getElementById("convert-value").value);
+        const from = parseUnitValue(fromUnitSelect.value);
+        const to = parseUnitValue(toUnitSelect.value);
+        const opts = buildConvertOpts(from, to);
+
+        const result = convertUnit(value, from.unit, to.unit, opts);
+        document.getElementById("convert-result").textContent =
+          result !== null ? result.toFixed(3) : "null (incompatible types)";
+
+        buildConvertPreview();
+      };
+
+      document.getElementById("convert-value").addEventListener("input", updateConversion);
+      fromUnitSelect.addEventListener("change", updateConversion);
+      toUnitSelect.addEventListener("change", updateConversion);
+      updateConversion();
     </script>
   </body>
 </html>
