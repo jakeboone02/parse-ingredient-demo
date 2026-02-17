@@ -181,6 +181,35 @@ Large egg x 2
         btn.addEventListener("click", cycleTheme);
       })();
     </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const COPY_CHAR = "\u29C9";
+        const COPIED_CHAR = "\u2713";
+
+        document.querySelectorAll("pre").forEach((pre) => {
+          const btn = document.createElement("button");
+          btn.className = "copy-btn";
+          btn.textContent = COPY_CHAR;
+          btn.title = "Copy";
+          btn.addEventListener("click", () => {
+            navigator.clipboard.writeText(pre.textContent.replace(COPY_CHAR, "").replace(COPIED_CHAR, "")).then(() => {
+              btn.textContent = COPIED_CHAR;
+              btn.classList.add("copied");
+              setTimeout(() => {
+                btn.textContent = COPY_CHAR;
+                btn.classList.remove("copied");
+              }, 1500);
+            });
+          });
+          pre.appendChild(btn);
+
+          // Re-append button after content updates that replace innerHTML
+          new MutationObserver(() => {
+            if (!pre.contains(btn)) pre.appendChild(btn);
+          }).observe(pre, { childList: true });
+        });
+      });
+    </script>
     <script type="module">
       import {
         parseIngredient,
@@ -237,7 +266,7 @@ Large egg x 2
         const opts = buildParseOpts();
         const hasOpts = Object.keys(opts).length > 0;
         parsePreviewEl.textContent = hasOpts
-          ? `parseIngredient(ingredientText, ${JSON.stringify(opts, null, 2)})`
+          ? `parseIngredient(ingredientText, ${JSON.stringify(opts, null, 2).replaceAll(/  "(\w+)":/g, "  $1:")})`
           : `parseIngredient(ingredientText)`;
         highlightEl(parsePreviewEl);
       };
