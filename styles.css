@@ -97,11 +97,12 @@ body {
    Typography
    ========================================================================== */
 h4 {
-  border-bottom: 2px solid var(--color-accent);
+  border-top: 2px solid var(--color-accent);
+  border-radius: 0.5rem 0.5rem 0 0;
   color: var(--color-text);
-  letter-spacing: 0.02em;
   margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
+  padding: 0.2rem 0.5rem 0.5rem 0.5rem;
+  background: linear-gradient(180deg, color-mix(var(--color-accent), transparent 40%) 0%, color-mix(var(--color-accent), transparent 60%) 100%);
 }
 
 h5 {
@@ -136,8 +137,13 @@ code {
   background-color: var(--color-bg-subtle);
   border: 1px solid var(--color-border-light);
   border-radius: 4px;
-  font-size: 0.9em;
+  font-size: 0.9rem;
+  letter-spacing: 0.04rem;
   padding: 0.15rem 0.35rem;
+}
+
+section + section {
+  margin-top: 3rem;
 }
 
 /* ==========================================================================
@@ -232,26 +238,25 @@ input[type="checkbox"] {
    Advanced Options (details/summary)
    ========================================================================== */
 .advanced-options {
-  border: 1px solid var(--color-border-light);
+  background-color: color-mix(var(--color-accent), transparent 90%);
   border-radius: 0.5rem;
+  border: 0;
   margin-top: 1rem;
   padding: 0;
 }
 
 .advanced-options summary {
   color: var(--color-text-muted);
+  border-radius: 0.5rem;
   cursor: pointer;
   font-size: 0.9rem;
   padding: 0.6rem 0.75rem;
   transition: color var(--transition-fast);
+  background: linear-gradient(180deg, color-mix(var(--color-accent), transparent 90%) 0%, transparent 100%);
 }
 
 .advanced-options summary:hover {
   color: var(--color-accent);
-}
-
-.advanced-options[open] summary {
-  border-bottom: 1px solid var(--color-border-light);
 }
 
 .advanced-options-grid {
@@ -416,6 +421,25 @@ pre.hljs {
 
 .convert-controls select {
   min-width: 6rem;
+}
+
+/* ==========================================================================
+   Extract Controls
+   ========================================================================== */
+.extract-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.extract-controls label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.extract-controls input[type="text"] {
+  width: 14rem;
 }
 
 /* ==========================================================================

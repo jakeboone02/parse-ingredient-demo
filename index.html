@@ -6,7 +6,7 @@
     <title>Parse Ingredients</title>
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/default.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.12.0/styles/default.min.css"
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
@@ -27,19 +27,17 @@
     </header>
 
     <p>
-      Enter an ingredient list in the text box below. Results update as you type. Numbers can be
-      integers, decimals, mixed numbers (e.g. <code>1 1/2</code>), or vulgar fractions (e.g.
-      <code>1½</code>).
+      Enter an ingredient list in the text box below. Results update as you type or choose options.
+    </p>
+    <p>
+      Numbers can be integers, decimals, mixed numbers (e.g. <code>1 1/2</code>), or vulgar
+      fractions (e.g. <code>1½</code>).
     </p>
 
     <section>
       <h4><code>parseIngredient</code></h4>
 
       <div class="checkbox-row">
-        <label>
-          <input type="checkbox" id="normalize-uom" />
-          <code>normalizeUOM</code>
-        </label>
         <label>
           <input type="checkbox" id="allow-leading-of" />
           <code>allowLeadingOf</code>
@@ -49,42 +47,52 @@
           <code>decimalSeparator: ","</code>
         </label>
         <label>
-          <input type="checkbox" id="include-meta" />
-          <code>includeMeta</code>
+          <input type="checkbox" id="normalize-uom" />
+          <code>normalizeUOM</code>
         </label>
         <label>
           <input type="checkbox" id="partial-unit-matching" />
           <code>partialUnitMatching</code>
+        </label>
+        <label>
+          <input type="checkbox" id="description-measurements" />
+          <code>descriptionMeasurements</code>
+        </label>
+        <label>
+          <input type="checkbox" id="include-meta" />
+          <code>includeMeta</code>
         </label>
       </div>
 
       <details class="advanced-options">
         <summary>Advanced options</summary>
         <div class="advanced-options-grid">
+          <label for="decimal-separator"><code>decimalSeparator</code></label>
+          <select id="decimal-separator" value="">
+            <option value="">undefined (".")</option>
+            <option value=".">.</option>
+            <option value=",">,</option>
+          </select>
+          <label for="ignore-uoms"><code>ignoreUOMs</code></label>
+          <input type="text" id="ignore-uoms" placeholder="" />
+          <label for="round"><code>round</code></label>
+          <input type="text" id="round" placeholder="3" />
           <label for="group-header-patterns"><code>groupHeaderPatterns</code></label>
-          <input
-            type="text"
-            id="group-header-patterns"
-            placeholder="For"
-          />
+          <input type="text" id="group-header-patterns" placeholder="For" />
           <label for="range-separators"><code>rangeSeparators</code></label>
-          <input
-            type="text"
-            id="range-separators"
-            placeholder="or, to"
-          />
+          <input type="text" id="range-separators" placeholder="or, to" />
           <label for="description-strip-prefixes"><code>descriptionStripPrefixes</code></label>
-          <input
-            type="text"
-            id="description-strip-prefixes"
-            placeholder="of"
-          />
+          <input type="text" id="description-strip-prefixes" placeholder="of" />
           <label for="trailing-quantity-context"><code>trailingQuantityContext</code></label>
-          <input
-            type="text"
-            id="trailing-quantity-context"
-            placeholder="from, of"
-          />
+          <input type="text" id="trailing-quantity-context" placeholder="from, of" />
+          <label for="leading-quantity-prefixes"><code>leadingQuantityPrefixes</code></label>
+          <input type="text" id="leading-quantity-prefixes" placeholder="" />
+          <label for="measurement-units"><code>measurementUnits</code></label>
+          <select id="measurement-units" value="">
+            <option value="">undefined ("All")</option>
+            <option value="all">All</option>
+            <option value="convertible">Convertible</option>
+          </select>
         </div>
       </details>
 
@@ -111,7 +119,8 @@ For The Cake
 3⁄4 teaspoon salt
 2 cups packed light-brown sugar
 Large egg x 2
-4 Granny Smith apples, peeled, two coarsely grated and two diced</textarea>
+4 Granny Smith apples, peeled, two coarsely grated and two diced</textarea
+          >
         </div>
         <div class="two-col-output">
           <h5>Results</h5>
@@ -140,6 +149,23 @@ Large egg x 2
       <div>
         <strong>Result:</strong>
         <span id="convert-result">-</span>
+      </div>
+    </section>
+
+    <section>
+      <h4><code>extractMeasurements</code></h4>
+
+      <div class="extract-controls">
+        <label for="extract-source">Source</label>
+        <input type="text" id="extract-source" value="cut into 1 1/2-inch cubes" />
+      </div>
+
+      <h5>Call</h5>
+      <pre id="extract-preview" class="call-preview language-javascript"></pre>
+
+      <div>
+        <strong>Result:</strong>
+        <pre id="extract-result" class="call-preview language-json">-</pre>
       </div>
     </section>
 
@@ -192,14 +218,16 @@ Large egg x 2
           btn.textContent = COPY_CHAR;
           btn.title = "Copy";
           btn.addEventListener("click", () => {
-            navigator.clipboard.writeText(pre.textContent.replace(COPY_CHAR, "").replace(COPIED_CHAR, "")).then(() => {
-              btn.textContent = COPIED_CHAR;
-              btn.classList.add("copied");
-              setTimeout(() => {
-                btn.textContent = COPY_CHAR;
-                btn.classList.remove("copied");
-              }, 1500);
-            });
+            navigator.clipboard
+              .writeText(pre.textContent.replace(COPY_CHAR, "").replace(COPIED_CHAR, ""))
+              .then(() => {
+                btn.textContent = COPIED_CHAR;
+                btn.classList.add("copied");
+                setTimeout(() => {
+                  btn.textContent = COPY_CHAR;
+                  btn.classList.remove("copied");
+                }, 1500);
+              });
           });
           pre.appendChild(btn);
 
@@ -210,24 +238,40 @@ Large egg x 2
         });
       });
     </script>
+    <script type="importmap">
+      {
+        "imports": {
+          "highlight.js": "https://esm.sh/highlight.js@11.12.0",
+          "parse-ingredient": "https://esm.sh/parse-ingredient@3.0.0",
+          "numeric-quantity": "https://esm.sh/numeric-quantity@3.3.2"
+        }
+      }
+    </script>
     <script type="module">
       import {
         parseIngredient,
         convertUnit,
+        extractMeasurements,
         unitsOfMeasure,
-      } from "https://esm.sh/parse-ingredient@2.1.0";
-      import hljs from "https://esm.sh/highlight.js";
+      } from "parse-ingredient";
+      import hljs from "highlight.js";
 
       // --- Elements ---
       const normalizeUOMEl = document.getElementById("normalize-uom");
       const allowLeadingOfEl = document.getElementById("allow-leading-of");
       const decimalCommaEl = document.getElementById("decimal-comma");
       const includeMetaEl = document.getElementById("include-meta");
+      const measurementUnitsEl = document.getElementById("measurement-units");
+      const decimalSeparatorEl = document.getElementById("decimal-separator");
+      const descriptionMeasurementsEl = document.getElementById("description-measurements");
       const partialUnitMatchingEl = document.getElementById("partial-unit-matching");
       const groupHeaderPatternsEl = document.getElementById("group-header-patterns");
+      const ignoreUOMsEl = document.getElementById("ignore-uoms");
+      const roundEl = document.getElementById("round");
       const rangeSeparatorsEl = document.getElementById("range-separators");
       const descriptionStripPrefixesEl = document.getElementById("description-strip-prefixes");
       const trailingQuantityContextEl = document.getElementById("trailing-quantity-context");
+      const leadingQuantityPrefixesEl = document.getElementById("leading-quantity-prefixes");
       const ingredientListEl = document.getElementById("ingredient-list");
       const resultsEl = document.getElementById("results");
       const parsePreviewEl = document.getElementById("parse-preview");
@@ -236,7 +280,18 @@ Large egg x 2
       const parseArrayOption = (el) => {
         const val = el.value.trim();
         if (!val) return undefined;
-        return val.split(",").map((s) => s.trim()).filter(Boolean);
+        return val
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+      };
+
+      const parseNumberOption = (el) => {
+        const val = el.value.trim();
+        if (val === "") return undefined;
+        if (val === "false") return false;
+        const num = Number(val);
+        return isNaN(num) ? undefined : num;
       };
 
       const buildParseOpts = () => {
@@ -245,7 +300,16 @@ Large egg x 2
         if (allowLeadingOfEl.checked) opts.allowLeadingOf = true;
         if (decimalCommaEl.checked) opts.decimalSeparator = ",";
         if (includeMetaEl.checked) opts.includeMeta = true;
+        const measurementUnits = measurementUnitsEl.value.trim();
+        if (measurementUnits) opts.measurementUnits = measurementUnits;
+        const decimalSeparator = decimalSeparatorEl.value.trim();
+        if (decimalSeparator) opts.decimalSeparator = decimalSeparator;
+        if (descriptionMeasurementsEl.checked) opts.descriptionMeasurements = true;
         if (partialUnitMatchingEl.checked) opts.partialUnitMatching = true;
+        const iuoms = parseArrayOption(ignoreUOMsEl);
+        if (iuoms) opts.ignoreUOMs = iuoms;
+        const round = parseNumberOption(roundEl);
+        if (round !== undefined) opts.round = round;
         const ghp = parseArrayOption(groupHeaderPatternsEl);
         if (ghp) opts.groupHeaderPatterns = ghp;
         const rs = parseArrayOption(rangeSeparatorsEl);
@@ -254,6 +318,8 @@ Large egg x 2
         if (dsp) opts.descriptionStripPrefixes = dsp;
         const tqc = parseArrayOption(trailingQuantityContextEl);
         if (tqc) opts.trailingQuantityContext = tqc;
+        const lqp = parseArrayOption(leadingQuantityPrefixesEl);
+        if (lqp) opts.leadingQuantityPrefixes = lqp;
         return opts;
       };
 
@@ -284,21 +350,27 @@ Large egg x 2
 
       // Bind parse option controls
       [
+        measurementUnitsEl,
+        decimalSeparatorEl,
         normalizeUOMEl,
         allowLeadingOfEl,
         decimalCommaEl,
         includeMetaEl,
+        descriptionMeasurementsEl,
         partialUnitMatchingEl,
       ].forEach((el) => el.addEventListener("change", updateResults));
 
       [
+        ingredientListEl,
+        ignoreUOMsEl,
+        roundEl,
         groupHeaderPatternsEl,
         rangeSeparatorsEl,
         descriptionStripPrefixesEl,
         trailingQuantityContextEl,
+        leadingQuantityPrefixesEl,
       ].forEach((el) => el.addEventListener("input", updateResults));
 
-      ingredientListEl.addEventListener("input", updateResults);
       updateResults();
 
       // --- Unit conversion ---
@@ -390,6 +462,22 @@ Large egg x 2
       fromUnitSelect.addEventListener("change", updateConversion);
       toUnitSelect.addEventListener("change", updateConversion);
       updateConversion();
+
+      const updateExtractResults = () => {
+        const source = document.getElementById("extract-source").value;
+        const extractPreviewEl = document.getElementById("extract-preview");
+        extractPreviewEl.textContent = `extractMeasurements("${source}")`;
+        highlightEl(extractPreviewEl);
+
+        const result = extractMeasurements(source);
+        const extractResultEl = document.getElementById("extract-result");
+        extractResultEl.textContent = JSON.stringify(result, null, 2);
+        highlightEl(extractResultEl);
+      };
+
+      document.getElementById("extract-source").addEventListener("input", updateExtractResults);
+
+      updateExtractResults();
     </script>
   </body>
 </html>
