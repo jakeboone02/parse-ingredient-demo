@@ -343,41 +343,6 @@ pre.hljs {
   overflow-y: auto;
 }
 
-/* Dark mode highlight.js overrides */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) pre.hljs {
-    color: #e0e0e0;
-  }
-  :root:not([data-theme="light"]) .hljs-attr {
-    color: #9cdcfe;
-  }
-  :root:not([data-theme="light"]) .hljs-string {
-    color: #ce9178;
-  }
-  :root:not([data-theme="light"]) .hljs-number {
-    color: #b5cea8;
-  }
-  :root:not([data-theme="light"]) .hljs-literal {
-    color: #569cd6;
-  }
-}
-
-:root[data-theme="dark"] pre.hljs {
-  color: #e0e0e0;
-}
-:root[data-theme="dark"] .hljs-attr {
-  color: #9cdcfe;
-}
-:root[data-theme="dark"] .hljs-string {
-  color: #ce9178;
-}
-:root[data-theme="dark"] .hljs-number {
-  color: #b5cea8;
-}
-:root[data-theme="dark"] .hljs-literal {
-  color: #569cd6;
-}
-
 /* ==========================================================================
    Two-Column Layout (textarea / results)
    ========================================================================== */

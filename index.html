@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Parse Ingredients</title>
     <link
+      id="hljs-theme"
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.12.0/styles/default.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.12.0/styles/github-dark-dimmed.css"
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
@@ -183,10 +184,20 @@ Large egg x 2
         const themes = ["light", "system", "dark"];
         const icons = { light: "☼", system: "◐", dark: "☾" };
         const titles = { light: "Light mode", system: "System preference", dark: "Dark mode" };
+        const hljsLink = document.getElementById("hljs-theme");
+        const darkMql = window.matchMedia("(prefers-color-scheme: dark)");
+        const hljsHref = (name) =>
+          `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.12.0/styles/${name}.css`;
+
+        function setHljsTheme(theme) {
+          const dark = theme === "dark" || (theme === "system" && darkMql.matches);
+          hljsLink.href = hljsHref(dark ? "github-dark-dimmed" : "github");
+        }
 
         function setTheme(theme) {
           btn.textContent = icons[theme];
           btn.title = titles[theme];
+          setHljsTheme(theme);
 
           if (theme === "system") {
             root.removeAttribute("data-theme");
@@ -205,6 +216,9 @@ Large egg x 2
 
         setTheme(localStorage.getItem("theme") || "system");
         btn.addEventListener("click", cycleTheme);
+        darkMql.addEventListener("change", () =>
+          setHljsTheme(localStorage.getItem("theme") || "system"),
+        );
       })();
     </script>
     <script>
